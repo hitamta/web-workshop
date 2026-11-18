@@ -1,0 +1,2460 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Workshop CĐ3: Cấu Trúc Kênh Phân Phối Vinamilk | Nhóm 04 - UTH</title>
+  <style>
+    :root {
+      --uth-teal: #00796b;
+      --uth-dark: #004d40;
+      --vnm-blue: #0d47a1;
+      --vnm-light: #e3f2fd;
+      --func-bg: #fff8e1;
+      --func-border: #f59e0b;
+      --func-text: #92400e;
+      --flow-bg: #eff6ff;
+      --flow-border: #3b82f6;
+      --flow-text: #1e40af;
+      --bg-page: #f4f7f9;
+      --card-bg: #ffffff;
+      --text-main: #1e293b;
+      --text-muted: #64748b;
+      --danger: #dc2626;
+      --success: #16a34a;
+      --border: #cbd5e1;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      background-color: var(--bg-page);
+      color: var(--text-main);
+      line-height: 1.5;
+    }
+
+    /* Header */
+    header {
+      background: linear-gradient(135deg, var(--uth-dark), var(--uth-teal));
+      color: #fff;
+      padding: 14px 24px;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .brand h1 {
+      font-size: 1.15rem;
+      font-weight: 700;
+      letter-spacing: 0.3px;
+    }
+
+    .brand p {
+      font-size: 0.8rem;
+      opacity: 0.9;
+    }
+
+    .header-controls {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .badge-info {
+      background: rgba(255, 255, 255, 0.16);
+      padding: 5px 12px;
+      border-radius: 20px;
+      font-size: 0.82rem;
+      font-weight: 600;
+    }
+
+    .timer-box {
+      background: #111827;
+      color: #34d399;
+      font-family: 'Courier New', monospace;
+      font-size: 1.15rem;
+      font-weight: 700;
+      padding: 5px 14px;
+      border-radius: 8px;
+      border: 1px solid #374151;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .timer-box.warning {
+      color: #fbbf24;
+    }
+
+    .timer-box.danger {
+      color: #f87171;
+      animation: pulse 1s infinite;
+    }
+
+    @keyframes pulse {
+      50% {
+        opacity: 0.6;
+      }
+    }
+
+    .btn {
+      border: none;
+      border-radius: 8px;
+      padding: 8px 14px;
+      font-size: 0.88rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .btn:active {
+      transform: scale(0.98);
+    }
+
+    .btn-primary {
+      background: var(--vnm-blue);
+      color: #fff;
+    }
+
+    .btn-primary:hover {
+      background: #0a367a;
+    }
+
+    .btn-success {
+      background: var(--success);
+      color: #fff;
+    }
+
+    .btn-success:hover {
+      background: #15803d;
+    }
+
+    .btn-warning {
+      background: #d97706;
+      color: #fff;
+    }
+
+    .btn-warning:hover {
+      background: #b45309;
+    }
+
+    .btn-outline {
+      background: #fff;
+      color: var(--text-main);
+      border: 1px solid var(--border);
+    }
+
+    .btn-outline:hover {
+      background: #f1f5f9;
+    }
+
+    .btn-ghost {
+      background: rgba(255, 255, 255, 0.18);
+      color: #fff;
+    }
+
+    .btn-ghost:hover {
+      background: rgba(255, 255, 255, 0.28);
+    }
+
+    /* Container */
+    .container {
+      max-width: 1400px;
+      margin: 18px auto;
+      padding: 0 16px;
+    }
+
+    /* Login / Setup Modal Overlay */
+    .overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.72);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 999;
+      padding: 16px;
+    }
+
+    .modal {
+      background: #fff;
+      border-radius: 14px;
+      max-width: 540px;
+      width: 100%;
+      padding: 24px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.25);
+    }
+
+    .modal h2 {
+      color: var(--uth-dark);
+      margin-bottom: 6px;
+      font-size: 1.3rem;
+    }
+
+    .modal .subtitle {
+      color: var(--text-muted);
+      font-size: 0.9rem;
+      margin-bottom: 18px;
+    }
+
+    .form-group {
+      margin-bottom: 14px;
+    }
+
+    .form-group label {
+      display: block;
+      font-weight: 600;
+      font-size: 0.88rem;
+      margin-bottom: 6px;
+    }
+
+    .form-control {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font-size: 0.95rem;
+    }
+
+    .role-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .role-card {
+      border: 2px solid var(--border);
+      border-radius: 10px;
+      padding: 12px;
+      cursor: pointer;
+      transition: 0.15s;
+    }
+
+    .role-card.active {
+      border-color: var(--uth-teal);
+      background: #f0fdfa;
+    }
+
+    .role-card strong {
+      display: block;
+      font-size: 0.95rem;
+      color: var(--uth-dark);
+    }
+
+    .role-card span {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+
+    /* Round Switcher & Info Banner */
+    .top-bar {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      background: #fff;
+      padding: 12px 18px;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      margin-bottom: 16px;
+      gap: 12px;
+    }
+
+    .round-tabs {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .round-tab {
+      padding: 8px 16px;
+      border-radius: 8px;
+      font-weight: 700;
+      font-size: 0.9rem;
+      cursor: pointer;
+      border: 2px solid transparent;
+      background: #e2e8f0;
+      color: #475569;
+    }
+
+    .round-tab.active-r1 {
+      background: var(--uth-teal);
+      color: #fff;
+    }
+
+    .round-tab.active-r2 {
+      background: #b45309;
+      color: #fff;
+    }
+
+    .round-tab.locked {
+      background: #f1f5f9;
+      color: #94a3b8;
+      border: 1.5px dashed #cbd5e1;
+      cursor: not-allowed;
+      opacity: 0.78;
+    }
+
+    .round-tab.readonly-tab {
+      background: #e2e8f0;
+      color: #334155;
+      border: 1.5px solid #94a3b8;
+      cursor: pointer;
+    }
+
+    .round-tab.active-r1-readonly {
+      background: #475569;
+      color: #fff;
+      border: 2px solid #1e293b;
+    }
+
+    .locked-view-banner {
+      display: none;
+      background: linear-gradient(90deg, #f1f5f9, #e2e8f0);
+      border: 2px solid #64748b;
+      border-radius: 12px;
+      padding: 14px 18px;
+      margin-bottom: 16px;
+      color: #1e293b;
+    }
+
+    .locked-view-banner.visible {
+      display: block;
+    }
+
+    .locked-view-banner h3 {
+      font-size: 0.98rem;
+      color: #0f172a;
+      margin-bottom: 3px;
+    }
+
+    .locked-view-banner p {
+      font-size: 0.85rem;
+      color: #334155;
+    }
+
+    .game-card.card-readonly {
+      cursor: not-allowed !important;
+      opacity: 0.9;
+      box-shadow: none;
+    }
+
+    .kpi-field input:disabled,
+    .kpi-field select:disabled {
+      background-color: #e2e8f0;
+      color: #334155;
+      cursor: not-allowed;
+      border-color: #94a3b8;
+    }
+
+    .btn:disabled {
+      opacity: 0.48;
+      cursor: not-allowed;
+      pointer-events: none;
+    }
+
+    .rule-note {
+      font-size: 0.83rem;
+      color: #0f766e;
+      background: #f0fdfa;
+      padding: 6px 12px;
+      border-radius: 8px;
+      border: 1px solid #99f6e4;
+      font-weight: 600;
+    }
+
+    /* Shock Banner for Round 2 */
+    .shock-banner {
+      display: none;
+      background: linear-gradient(90deg, #fffbeb, #fef3c7);
+      border: 2px solid #f59e0b;
+      border-radius: 12px;
+      padding: 14px 18px;
+      margin-bottom: 16px;
+      color: #78350f;
+    }
+
+    .shock-banner.visible {
+      display: block;
+    }
+
+    .shock-banner h3 {
+      font-size: 1rem;
+      margin-bottom: 4px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .shock-banner p {
+      font-size: 0.88rem;
+    }
+
+    /* Main Workspace Layout */
+    .workspace {
+      display: grid;
+      grid-template-columns: 330px 1fr;
+      gap: 16px;
+      align-items: start;
+    }
+
+    @media (max-width: 1024px) {
+      .workspace {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* Card Bank (Left Panel) */
+    .panel {
+      background: var(--card-bg);
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      padding: 16px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    }
+
+    .panel-title {
+      font-size: 0.98rem;
+      font-weight: 700;
+      margin-bottom: 10px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 6px;
+      border-bottom: 1px solid #e2e8f0;
+      padding-bottom: 8px;
+    }
+
+    .card-section-label {
+      font-size: 0.78rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin: 10px 0 6px;
+      color: var(--text-muted);
+    }
+
+    .card-pool {
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+      min-height: 60px;
+      padding: 6px;
+      background: #f8fafc;
+      border-radius: 8px;
+      border: 1px dashed #cbd5e1;
+    }
+
+    /* Draggable Cards */
+    .game-card {
+      padding: 8px 10px;
+      border-radius: 8px;
+      font-size: 0.83rem;
+      font-weight: 600;
+      cursor: grab;
+      user-select: none;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 6px;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06);
+      transition: transform 0.1s, box-shadow 0.1s;
+    }
+
+    .game-card:active {
+      cursor: grabbing;
+    }
+
+    .game-card.selected-tap {
+      outline: 3px solid #111827;
+      transform: scale(1.02);
+    }
+
+    .card-func {
+      background: var(--func-bg);
+      border: 1.5px solid var(--func-border);
+      color: var(--func-text);
+    }
+
+    .card-flow {
+      background: var(--flow-bg);
+      border: 1.5px solid var(--flow-border);
+      color: var(--flow-text);
+    }
+
+    .card-tag {
+      font-size: 0.68rem;
+      padding: 2px 6px;
+      border-radius: 4px;
+      background: rgba(255, 255, 255, 0.75);
+      white-space: nowrap;
+    }
+
+    /* Diagram Area (Right Panel) */
+    .diagram-wrapper {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    /* Channel Actors Grid */
+    .actors-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+    }
+
+    @media (max-width: 768px) {
+      .actors-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .actor-box {
+      border: 2px solid #94a3b8;
+      border-radius: 12px;
+      background: #ffffff;
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
+      transition: all 0.2s;
+      position: relative;
+    }
+
+    .actor-box.nsx {
+      border-color: var(--vnm-blue);
+      background: #f8fbff;
+    }
+
+    .actor-box.wholesaler {
+      border-color: #0d9488;
+      background: #f7fefe;
+    }
+
+    .actor-box.retailer {
+      border-color: #7c3aed;
+      background: #faf8ff;
+    }
+
+    /* Disabled Wholesaler in Round 2 */
+    .actor-box.cut-off {
+      background: #fee2e2;
+      border-color: #ef4444;
+      opacity: 0.78;
+    }
+
+    .cut-badge {
+      display: none;
+      background: #dc2626;
+      color: #fff;
+      font-size: 0.72rem;
+      font-weight: 700;
+      padding: 3px 8px;
+      border-radius: 6px;
+      margin-bottom: 6px;
+      text-align: center;
+    }
+
+    .actor-box.cut-off .cut-badge {
+      display: block;
+    }
+
+    .actor-header {
+      text-align: center;
+      padding-bottom: 8px;
+      margin-bottom: 8px;
+      border-bottom: 1px solid #e2e8f0;
+    }
+
+    .actor-header h4 {
+      font-size: 0.95rem;
+      font-weight: 700;
+    }
+
+    .actor-header small {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      display: block;
+    }
+
+    .dropzone {
+      min-height: 135px;
+      background: rgba(241, 245, 249, 0.7);
+      border: 2px dashed #cbd5e1;
+      border-radius: 8px;
+      padding: 8px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      transition: background 0.15s, border-color 0.15s;
+    }
+
+    .dropzone.drag-over {
+      background: #dcfce7;
+      border-color: #16a34a;
+    }
+
+    .dropzone-hint {
+      font-size: 0.75rem;
+      color: #94a3b8;
+      text-align: center;
+      margin: auto;
+      pointer-events: none;
+    }
+
+    /* Flows Section */
+    .flows-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+    }
+
+    @media (max-width: 768px) {
+      .flows-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .flow-box {
+      border: 2px solid #60a5fa;
+      border-radius: 12px;
+      background: #f8fafc;
+      padding: 12px;
+    }
+
+    .flow-box h4 {
+      font-size: 0.88rem;
+      color: var(--flow-text);
+      margin-bottom: 4px;
+      text-align: center;
+    }
+
+    .flow-box p {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      text-align: center;
+      margin-bottom: 8px;
+    }
+
+    /* E-commerce Direct Channel Box (Visible in R2) */
+    .ecom-box {
+      display: none;
+      border: 2px dashed #d97706;
+      background: #fffbeb;
+      border-radius: 10px;
+      padding: 10px 14px;
+      font-size: 0.85rem;
+      color: #92400e;
+    }
+
+    .ecom-box.visible {
+      display: block;
+    }
+
+    /* KPI Calculation Panel */
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: 1fr 1.2fr;
+      gap: 16px;
+    }
+
+    @media (max-width: 900px) {
+      .kpi-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .data-card {
+      background: #f8fafc;
+      border: 1px solid #cbd5e1;
+      border-radius: 10px;
+      padding: 12px;
+      font-size: 0.85rem;
+    }
+
+    .data-card ul {
+      padding-left: 18px;
+      margin-top: 6px;
+    }
+
+    .data-card li {
+      margin-bottom: 4px;
+    }
+
+    .kpi-inputs {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    @media (max-width: 600px) {
+      .kpi-inputs {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .kpi-field label {
+      display: block;
+      font-size: 0.8rem;
+      font-weight: 700;
+      margin-bottom: 4px;
+      color: var(--text-main);
+    }
+
+    .kpi-field input {
+      width: 100%;
+      padding: 8px 10px;
+      border: 1.5px solid #94a3b8;
+      border-radius: 8px;
+      font-size: 0.92rem;
+      font-weight: 600;
+    }
+
+    /* Submit & Receipt Bar */
+    .action-bar {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      margin-top: 14px;
+      padding-top: 14px;
+      border-top: 1px solid #e2e8f0;
+    }
+
+    .receipt-box {
+      display: none;
+      margin-top: 14px;
+      background: #f0fdf4;
+      border: 1.5px solid #22c55e;
+      border-radius: 10px;
+      padding: 14px;
+    }
+
+    .receipt-box.visible {
+      display: block;
+    }
+
+    .receipt-code {
+      width: 100%;
+      margin-top: 8px;
+      padding: 8px;
+      font-family: monospace;
+      font-size: 0.8rem;
+      background: #fff;
+      border: 1px solid #bbf7d0;
+      border-radius: 6px;
+      resize: none;
+    }
+
+    /* BTC Dashboard View */
+    #btcView {
+      display: none;
+    }
+
+    .btc-table-wrap {
+      overflow-x: auto;
+      margin-top: 12px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.84rem;
+      background: #fff;
+    }
+
+    th,
+    td {
+      border: 1px solid #cbd5e1;
+      padding: 8px 8px;
+      text-align: center;
+    }
+
+    th {
+      background: var(--uth-dark);
+      color: #fff;
+      font-weight: 600;
+    }
+
+    tr:nth-child(even) {
+      background: #f8fafc;
+    }
+
+    .score-input {
+      width: 56px;
+      padding: 4px;
+      text-align: center;
+      border: 1px solid #94a3b8;
+      border-radius: 4px;
+      font-weight: 700;
+      background: #fffbeb;
+    }
+
+    .rank-1 {
+      background: #fef08a !important;
+      font-weight: 700;
+    }
+
+    .rank-2 {
+      background: #e2e8f0 !important;
+      font-weight: 700;
+    }
+
+    .rank-3 {
+      background: #fed7aa !important;
+      font-weight: 700;
+    }
+
+    /* Toast */
+    .toast {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: #1e293b;
+      color: #fff;
+      padding: 12px 18px;
+      border-radius: 10px;
+      font-size: 0.9rem;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+      z-index: 2000;
+      display: none;
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- LOGIN / ROLE SELECTION MODAL -->
+  <div class="overlay" id="loginOverlay">
+    <div class="modal">
+      <h2>Workshop Quản Trị Chuỗi Cung Ứng (016072)</h2>
+      <p class="subtitle">Chủ đề 3: Thiết kế cấu trúc kênh Vinamilk · Nhóm 04 điều hành</p>
+
+      <div class="form-group">
+        <label for="teamSelect">1. Chọn Đội của bạn (7 Đội thi · Nhóm 04 điều hành):</label>
+        <select id="teamSelect" class="form-control" onchange="updateUserBadge()">
+          <option value="" selected disabled>-- Chọn đội của bạn --</option>
+          <option value="Đội 1">Đội 1</option>
+          <option value="Đội 2">Đội 2</option>
+          <option value="Đội 3">Đội 3</option>
+          <option value="Đội 5">Đội 5</option>
+          <option value="Đội 6">Đội 6</option>
+          <option value="Đội 7">Đội 7</option>
+          <option value="Đội 8">Đội 8</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="playerName">2. Họ tên :</label>
+        <input type="text" id="playerName" class="form-control" placeholder="Ví dụ: Nguyễn Văn A" />
+      </div>
+
+      <div class="form-group">
+        <label>3. Chọn Vai trò trong phiên :</label>
+        <div class="role-grid">
+          <div class="role-card active" id="roleMember" onclick="selectRole('member')">
+            <strong>👥 Thành viên đội</strong>
+            <span>Kéo thả thẻ &amp; tính KPI nháp để thảo luận cùng đội (không xem điểm/biên nhận).</span>
+          </div>
+          <div class="role-card" id="roleLeader" onclick="selectRole('leader')">
+            <strong>👑 Đội trưởng (Nộp bài)</strong>
+            <span>Đại diện duy nhất của đội gửi kết quả chính thức về BTC.</span>
+          </div>
+        </div>
+      </div>
+
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-top:18px; gap:10px;">
+        <button class="btn btn-outline" onclick="openBtcLogin()">🔒 Dành cho BTC / Trọng tài</button>
+        <button class="btn btn-primary" onclick="startGame()">Vào Phòng Thi (Tự động tính giờ) &rarr;</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- HEADER -->
+  <header>
+    <div class="brand">
+      <h1>UTH · WORKSHOP CĐ3: THIẾT KẾ CẤU TRÚC KÊNH VINAMILK</h1>
+      <p>Học phần Quản trị chuỗi cung ứng (016072) · Nhóm 04 Điều Hành</p>
+    </div>
+    <div class="header-controls">
+      <span class="badge-info" id="userBadge" onclick="reopenTeamModal()" style="cursor:pointer;"
+        title="Bấm để đổi đội hoặc vai trò">Chưa chọn đội</span>
+      <div class="timer-box" id="timerDisplay">
+        <span id="clockText">09:00</span>
+        <button class="btn btn-ghost" style="padding:2px 8px; font-size:0.75rem;" onclick="toggleTimer()"
+          id="timerBtn">Tạm dừng</button>
+      </div>
+      <button class="btn btn-ghost" onclick="switchView('game')">🎮 Bàn chơi</button>
+      <button class="btn btn-ghost" onclick="openBtcLogin()">📊 Bảng tổng hợp BTC</button>
+    </div>
+  </header>
+
+  <!-- PLAYER WORKSPACE VIEW -->
+  <div class="container" id="gameView">
+    <!-- Round Switcher -->
+    <div class="top-bar">
+      <div class="round-tabs">
+        <button class="round-tab active-r1" id="tabR1" onclick="setRound(1)">VÒNG 1: Kênh 3 Cấp Truyền Thống (9
+          phút)</button>
+        <button class="round-tab locked" id="tabR2" onclick="setRound(2)">🔒 VÒNG 2: Thẻ Cú Sốc - Bỏ NPP &amp; Bán Buôn
+          + Thêm
+          E-Commerce (7 phút)</button>
+      </div>
+      <div class="rule-note" id="roundRuleBadge">
+        ⚖️ Vòng 1: Thẻ (7,5đ) + KPI tính toán (2đ) + Lập luận (0,5đ) = 10đ | Vòng 2: Thẻ (6đ) + KPI (4đ) = 10đ
+      </div>
+    </div>
+
+    <!-- Round 1 Read-Only Locked Banner -->
+    <div class="locked-view-banner" id="r1LockedBanner">
+      <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+        <div>
+          <h3>🔒 VÒNG 1 ĐÃ NỘP BÀI &amp; KHÓA SỬA — CHẾ ĐỘ CHỈ XEM ĐỀ &amp; ĐÁP ÁN ĐÃ ĐIỀN</h3>
+          <p>Đội của bạn đã nộp bài Vòng 1 và chuyển sang Vòng 2 nên không thể chỉnh sửa hay nộp lại Vòng 1. Đồng hồ
+            Vòng 2 vẫn đang tiếp tục đếm ngược!</p>
+        </div>
+        <button class="btn btn-warning" onclick="setRound(2)">▶️ Quay lại làm tiếp Vòng 2 &rarr;</button>
+      </div>
+    </div>
+
+    <!-- Round 2 Shock Banner -->
+    <div class="shock-banner" id="shockBanner">
+      <h3>⚡ THẺ CÚ SỐC VÒNG 2 ĐÃ KÍCH HOẠT: Cắt bỏ cả Nhà phân phối &amp; Nhà bán buôn, Mở kênh trực tiếp E-Commerce!
+      </h3>
+      <p>
+        <strong>Nhiệm vụ Vòng 2:</strong> (1) Gỡ toàn bộ <strong>thẻ chức năng</strong> đang nằm ở cột <em>Nhà phân phối
+          / Bán buôn
+          (đã bị gạch đỏ)</em> và chuyển sang chủ thể mới gánh vác nó (<strong>Nhà sản xuất Vinamilk</strong> hoặc
+        <strong>Nhà bán lẻ</strong>); (2) Giữ nguyên các dòng chảy (vì dòng chảy không biến mất); (3) Tính lại giá bán
+        lẻ mới (khi đã cắt cả NPP 8% lẫn Bán buôn 5%, chỉ còn Margin Tạp hóa 15%) và số giao dịch mới ở bên dưới.
+      </p>
+    </div>
+
+    <!-- Drag & Drop Workspace -->
+    <div class="workspace">
+      <!-- Left: 16 Cards Pool -->
+      <div class="panel">
+        <div class="panel-title">
+          <span>🗂️ Kho 16 Thẻ (Còn: <strong id="remainingCount">16</strong>)</span>
+          <button class="btn btn-outline" id="resetBoardBtn" style="padding:4px 8px; font-size:0.75rem;"
+            onclick="resetBoard()">Xếp
+            lại</button>
+        </div>
+        <p style="font-size:0.78rem; color:var(--text-muted); margin-bottom:6px;">
+          💡 <strong>Cách chơi:</strong> Kéo thả thẻ vào khung bên phải, <em>hoặc</em> bấm chọn 1 thẻ rồi bấm vào khung
+          muốn đặt.
+        </p>
+
+        <div class="card-section-label">🟨 8 Thẻ Chức Năng Kênh (Đặt vào Tác nhân)</div>
+        <div class="card-pool" id="pool-func" ondragover="allowDrop(event)" ondrop="dropToPool(event)"
+          onclick="clickZone('pool-func')"></div>
+
+        <div class="card-section-label">🟦 8 Thẻ Dòng Chảy Kênh (Đặt vào Mũi tên)</div>
+        <div class="card-pool" id="pool-flow" ondragover="allowDrop(event)" ondrop="dropToPool(event)"
+          onclick="clickZone('pool-flow')"></div>
+      </div>
+
+      <!-- Right: Channel Diagram & KPI -->
+      <div class="diagram-wrapper">
+        <!-- Part A: Channel Actors -->
+        <div class="panel">
+          <div class="panel-title">
+            <span>🏭 PHẦN 1: SƠ ĐỒ TÁC NHÂN &amp; PHÂN BỔ CHỨC NĂNG (8 Thẻ Vàng)</span>
+            <span style="font-size:0.8rem; color:var(--uth-teal); font-weight:700;" id="part1WeightLabel">Phần 1 + Phần
+              2 = 7,5 điểm (Cấu trúc: Kênh 3 cấp)</span>
+          </div>
+
+          <div class="ecom-box" id="ecomBox" style="margin-bottom:12px;">
+            🌐 <strong>Nhánh Kênh 0 Cấp Mới (Giấc Mơ Sữa Việt / App &amp; E-Commerce · Margin 15%):</strong> Vinamilk
+            &rarr; Người tiêu
+            dùng trực tiếp (Cắt hoàn toàn trung gian, NSX tự vận hành kho chia lô nhỏ &amp; giao chặng cuối).
+          </div>
+
+          <div class="actors-grid">
+            <!-- Actor 1: Manufacturer -->
+            <div class="actor-box nsx" id="box-nsx">
+              <div class="actor-header">
+                <h4>1. Nhà Sản Xuất (Vinamilk)</h4>
+                <small>Số lượng: M = 5 nhà sản xuất</small>
+              </div>
+              <div class="dropzone" id="zone-nsx" ondragover="allowDrop(event)" ondrop="dropToZone(event, 'zone-nsx')"
+                onclick="clickZone('zone-nsx')">
+                <span class="dropzone-hint">Thả thẻ chức năng của NSX vào đây</span>
+              </div>
+            </div>
+
+            <!-- Actor 2: Wholesaler -->
+            <div class="actor-box wholesaler" id="box-wholesaler">
+              <div class="cut-badge">❌ ĐÃ CẮT BỎ Ở VÒNG 2 — GỠ THẺ RA!</div>
+              <div class="actor-header">
+                <h4>2. Nhà Bán Buôn / NPP</h4>
+                <small>Số lượng: k = 3 NPP khu vực · Margin: 8% / 5%</small>
+              </div>
+              <div class="dropzone" id="zone-wholesaler" ondragover="allowDrop(event)"
+                ondrop="dropToZone(event, 'zone-wholesaler')" onclick="clickZone('zone-wholesaler')">
+                <span class="dropzone-hint">Thả thẻ chức năng của Bán buôn vào đây</span>
+              </div>
+            </div>
+
+            <!-- Actor 3: Retailer -->
+            <div class="actor-box retailer" id="box-retailer">
+              <div class="actor-header">
+                <h4>3. Nhà Bán Lẻ / Tạp Hóa</h4>
+                <small>Số lượng: C = 1.000 tiệm tạp hóa · Margin: 15%</small>
+              </div>
+              <div class="dropzone" id="zone-retailer" ondragover="allowDrop(event)"
+                ondrop="dropToZone(event, 'zone-retailer')" onclick="clickZone('zone-retailer')">
+                <span class="dropzone-hint">Thả thẻ chức năng của Bán lẻ vào đây</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Part B: Channel Flows -->
+        <div class="panel">
+          <div class="panel-title">
+            <span>🔄 PHẦN 2: TRỤC DÒNG CHẢY TRONG KÊNH (8 Thẻ Xanh)</span>
+            <span style="font-size:0.78rem; color:var(--text-muted);" id="part2WeightLabel">Gộp chung 16 thẻ: tối đa 7,5
+              điểm (0,47đ/thẻ)</span>
+          </div>
+
+          <div class="flows-grid">
+            <div class="flow-box">
+              <h4>➡️ Dòng Xuôi Chiều (3 thẻ)</h4>
+              <p>Từ NSX &rarr; Trung gian &rarr; NTD</p>
+              <div class="dropzone" id="zone-flow-forward" ondragover="allowDrop(event)"
+                ondrop="dropToZone(event, 'zone-flow-forward')" onclick="clickZone('zone-flow-forward')">
+                <span class="dropzone-hint">Thả 3 dòng xuôi chiều</span>
+              </div>
+            </div>
+
+            <div class="flow-box">
+              <h4>⬅️ Dòng Ngược Chiều (2 thẻ)</h4>
+              <p>Từ NTD &rarr; Trung gian &rarr; NSX</p>
+              <div class="dropzone" id="zone-flow-backward" ondragover="allowDrop(event)"
+                ondrop="dropToZone(event, 'zone-flow-backward')" onclick="clickZone('zone-flow-backward')">
+                <span class="dropzone-hint">Thả 2 dòng ngược chiều</span>
+              </div>
+            </div>
+
+            <div class="flow-box">
+              <h4>↔️ Dòng Hai Chiều (3 thẻ)</h4>
+              <p>Tương tác qua lại NSX &harr; NTD</p>
+              <div class="dropzone" id="zone-flow-two" ondragover="allowDrop(event)"
+                ondrop="dropToZone(event, 'zone-flow-two')" onclick="clickZone('zone-flow-two')">
+                <span class="dropzone-hint">Thả 3 dòng hai chiều</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Part C: KPI Calculation (Bối cảnh TP. Thủ Đức – Case Vinamilk) -->
+        <div class="panel">
+          <div class="panel-title">
+            <span id="part3Title">🧮 PHẦN 3: TÍNH TOÁN KPI &amp; LẬP LUẬN (2,5 điểm)</span>
+            <span style="font-size:0.78rem; color:var(--uth-teal); font-weight:700;" id="part3WeightLabel">2 câu tính
+              toán tự động (2,0đ) + 1 câu lập luận BTC chấm (0,5đ)</span>
+          </div>
+
+          <div class="kpi-grid">
+            <div class="data-card">
+              <strong>📋 Thẻ Dữ Liệu Đầu Vào (Bối cảnh Khu vực TP. Thủ Đức – Case Vinamilk):</strong>
+              <ul>
+                <li>Quy mô tác nhân: <strong>M = 5</strong> Nhà sản xuất ngành sữa &amp; đồ uống (trong đó có Vinamilk),
+                  <strong>3</strong> Nhà phân phối khu vực, <strong>C = 1.000</strong> tiệm tạp hóa.
+                </li>
+                <li>Giá xuất xưởng chuẩn (P): <strong>280.000 VNĐ</strong> / thùng sữa (48 hộp &times; 180ml).</li>
+                <li>Tỷ suất cộng thêm (Margin): Nhà phân phối <strong>8%</strong>, Bán buôn <strong>5%</strong>, Tạp hóa
+                  <strong>15%</strong> (Kênh trực tiếp 0 cấp Giấc Mơ Sữa Việt / App: <strong>15%</strong>).
+                </li>
+                <li>Công thức giao dịch chuẩn: Trực tiếp = <code>M &times; C</code>; Qua 1 trung gian =
+                  <code>M + C</code>; Qua k trung gian song song = <code>k(M + C)</code>.
+                </li>
+              </ul>
+            </div>
+
+            <div>
+              <!-- Round 1 KPI Inputs -->
+              <div id="kpiR1" class="kpi-inputs">
+                <div class="kpi-field">
+                  <label>1. Số giao dịch qua trung gian N = k(M + C) (1,0đ):</label>
+                  <input type="number" id="r1_tx" placeholder="Nhập kết quả..." />
+                </div>
+                <div class="kpi-field">
+                  <label>2. Giá NTD phải trả - VNĐ/thùng (1,0đ tự động):</label>
+                  <input type="number" id="r1_price" placeholder="Nhập kết quả..." />
+                </div>
+                <div class="kpi-field" style="grid-column: 1 / -1;">
+                  <label>3. Tóm tắt lập luận ngắn gọn của đội (0,5đ BTC tự chấm):</label>
+                  <input type="text" id="r1_note"
+                    placeholder="Giải thích ngắn gọn vai trò trung gian & mức chênh lệch giá..." />
+                </div>
+              </div>
+
+              <!-- Round 2 KPI Inputs -->
+              <div id="kpiR2" class="kpi-inputs" style="display:none;">
+                <div class="kpi-field">
+                  <label>1. Số giao dịch kênh trực tiếp N = M &times; C (1,0đ):</label>
+                  <input type="number" id="r2_tx" placeholder="Nhập kết quả..." />
+                </div>
+                <div class="kpi-field">
+                  <label>2. Giá bán lẻ mới khi bỏ cả NPP &amp; Bán buôn - VNĐ (1,0đ):</label>
+                  <input type="number" id="r2_price_retail" placeholder="Nhập kết quả..." />
+                </div>
+                <div class="kpi-field">
+                  <label>3. Giá niêm yết kênh E-Commerce 0 cấp (Margin 15%) - VNĐ (1,0đ):</label>
+                  <input type="number" id="r2_price_ecom" placeholder="Nhập kết quả..." />
+                </div>
+                <div class="kpi-field">
+                  <label>4. Chi phí chức năng có biến mất không? (1,0đ):</label>
+                  <select id="r2_cost_shift" class="form-control" style="padding:8px;">
+                    <option value="">-- Chọn nhận định --</option>
+                    <option value="disappear">Có, cắt trung gian nên chi phí biến mất hoàn toàn</option>
+                    <option value="shift_to_nsx">Không biến mất, dịch chuyển ngược lại cho Vinamilk gánh</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Action & Submission Bar -->
+          <div class="action-bar">
+            <div style="font-size:0.83rem; color:var(--text-muted);" id="submitHint">
+              Bạn đang ở chế độ <strong>Thành viên</strong>: Chỉ thao tác nháp &amp; thảo luận cùng đội (chỉ Đội trưởng
+              mới được nộp bài và xuất biên nhận).
+            </div>
+            <div style="display:flex; gap:10px; flex-wrap:wrap;">
+              <button class="btn btn-warning" id="memberNextRoundBtn" style="display:none;" onclick="setRound(2)">➡️
+                Chuyển Sang Nháp Vòng 2</button>
+              <button class="btn btn-warning" id="previewReceiptBtn" style="display:none;"
+                onclick="evaluateAndGenerateReceipt(false)">📋 Xem Kết Quả &amp; Tạo Biên Nhận</button>
+              <button class="btn btn-success" id="officialSubmitBtn" style="display:none;"
+                onclick="evaluateAndGenerateReceipt(true)">🚀 Nộp Bài Chính Thức Về BTC</button>
+            </div>
+          </div>
+
+          <!-- Backup Receipt Box -->
+          <div class="receipt-box" id="receiptBox">
+            <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
+              <strong style="color:#15803d;" id="receiptTitle">✅ Đã ghi nhận kết quả!</strong>
+              <div style="display:flex; gap:8px; flex-wrap:wrap;">
+                <button class="btn btn-primary" style="padding:5px 12px; font-size:0.8rem;" onclick="copyReceipt()">📄
+                  Copy Biên Nhận Dán Vào Chat Meet/Zalo</button>
+                <button class="btn btn-warning" id="nextRoundBtn"
+                  style="display:none; padding:5px 12px; font-size:0.8rem;" onclick="setRound(2)">➡️ Sang Vòng 2
+                  Ngay</button>
+              </div>
+            </div>
+            <p style="font-size:0.82rem; color:#166534; margin-top:4px;" id="receiptSummary"></p>
+            <textarea class="receipt-code" id="receiptCode" rows="2" readonly></textarea>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- BTC / REFEREE DASHBOARD VIEW -->
+  <div class="container" id="btcView">
+    <div class="panel">
+      <div class="panel-title">
+        <span>📊 BẢNG TỔNG HỢP ĐIỂM &amp; XẾP HẠNG CHUNG CUỘC (TRỌNG TÀI: ĐẶNG NGUYÊN MẠNH)</span>
+        <div style="display:flex; gap:8px; flex-wrap:wrap;">
+          <button class="btn btn-outline" onclick="syncFromGoogleSheet()">🔄 Tải dữ liệu từ Google Sheet</button>
+          <button class="btn btn-primary" onclick="promptImportReceipt()">📥 Nhập Biên Nhận Từ Chat</button>
+          <button class="btn btn-success" onclick="exportCsv()">⬇️ Xuất File Excel (.CSV)</button>
+          <button class="btn btn-outline" onclick="clearLocalRoundLocks()"
+            title="Xóa trạng thái khóa Vòng 1 lưu trên trình duyệt này để test lại">🔓 Reset khóa V1 (Máy này)</button>
+        </div>
+      </div>
+
+      <p style="font-size:0.84rem; color:var(--text-muted); margin-bottom:10px;">
+        <strong>Vòng 1 (10đ):</strong> Thẻ (7,5đ) + KPI tự động (2đ) + Lập luận BTC chấm (0,5đ) &minus; Trừ lỗi.
+        &nbsp;|&nbsp;
+        <strong>Vòng 2 (10đ):</strong> Thẻ (6đ) + KPI tự động (4đ) &minus; Trừ lỗi. &nbsp;|&nbsp;
+        <strong>Tổng 2 vòng = 20đ.</strong>
+      </p>
+
+      <div class="btc-table-wrap">
+        <table id="btcTable">
+          <thead>
+            <tr>
+              <th>Hạng</th>
+              <th>Đội</th>
+              <th>V1: Thẻ (7,5đ)</th>
+              <th>V1: KPI (2đ)</th>
+              <th>V1: Lập luận (0,5đ)</th>
+              <th>V1: Trừ lỗi</th>
+              <th>Tổng V1 (10đ)</th>
+              <th>V2: Thẻ (6đ)</th>
+              <th>V2: KPI (4đ)</th>
+              <th>V2: Trừ lỗi</th>
+              <th>Tổng V2 (10đ)</th>
+              <th>TỔNG (20đ)</th>
+              <th>Điểm Cộng (E7)</th>
+            </tr>
+          </thead>
+          <tbody id="btcTableBody"></tbody>
+        </table>
+      </div>
+
+      <div style="margin-top:16px; padding:12px; background:#f8fafc; border-radius:8px; border:1px solid #cbd5e1;">
+        <strong style="font-size:0.88rem;">⚙️ Cấu hình kết nối Google Apps Script:</strong>
+        <div style="display:flex; gap:8px; margin-top:6px; flex-wrap:wrap;">
+          <input type="text" id="gasUrlInput" class="form-control"
+            style="max-width:520px; padding:6px 10px; font-size:0.85rem;"
+            placeholder="Dán URL Web App của Google Apps Script vào đây..." />
+          <button class="btn btn-outline" style="padding:6px 12px; font-size:0.85rem;" onclick="saveGasUrl()">Lưu
+            URL</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script>
+    // =========================================================================
+    // 1. CẤU HÌNH KẾT NỐI GOOGLE APPS SCRIPT (Đã gắn sẵn URL của Nhóm 04)
+    // =========================================================================
+    let GAS_WEB_APP_URL = localStorage.getItem('uth_ws_gas_url') || "https://script.google.com/macros/s/AKfycby4CW1bymu1SojvkxNhw-OaxhbBKrIUTFGt250EYrnjSqF-591TQoZvA-CWlnueaxNg4g/exec";
+    let lastWarmupAt = 0;
+    let isSubmittingNow = false;
+
+    // Đánh thức trước máy chủ Google Apps Script để loại bỏ độ trễ khởi động lạnh (cold-start)
+    function warmUpAppsScript(force = false) {
+      if (!GAS_WEB_APP_URL) return;
+      const now = Date.now();
+      if (!force && now - lastWarmupAt < 40000) return;
+      lastWarmupAt = now;
+      try {
+        const sep = GAS_WEB_APP_URL.includes('?') ? '&' : '?';
+        fetch(`${GAS_WEB_APP_URL}${sep}warmup=1&t=${now}`, {
+          method: 'GET',
+          mode: 'no-cors',
+          cache: 'no-store',
+          keepalive: true
+        }).catch(() => { });
+      } catch (e) { }
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+      try {
+        TEAM_LIST.forEach(t => localStorage.removeItem(`uth_ws04_team_${t}`));
+      } catch (e) { }
+      const teamSelect = document.getElementById('teamSelect');
+      const playerInput = document.getElementById('playerName');
+      if (teamSelect) teamSelect.value = '';
+      if (playerInput) playerInput.value = '';
+      selectRole('member');
+      resetAllToBeginning(false);
+      warmUpAppsScript(true);
+    });
+
+    // =========================================================================
+    // 2. DỮ LIỆU 16 THẺ CHUẨN GIÁO TRÌNH (8 CHỨC NĂNG + 8 DÒNG CHẢY)
+    // =========================================================================
+    const CARDS = [
+      // 8 Chức năng (Màu vàng)
+      {id: 'fn_research', type: 'func', title: 'Nghiên cứu thị trường', desc: 'Dữ liệu nhu cầu', r1Zone: 'zone-nsx', r2Zones: ['zone-nsx']},
+      {id: 'fn_promo', type: 'func', title: 'Xúc tiến bán hàng', desc: 'Quảng bá thương hiệu', r1Zone: 'zone-nsx', r2Zones: ['zone-nsx', 'zone-retailer']},
+      {id: 'fn_phys', type: 'func', title: 'Phân phối vật chất', desc: 'Kho bãi & vận tải', r1Zone: 'zone-wholesaler', r2Zones: ['zone-nsx', 'zone-retailer']},
+      {id: 'fn_finance', type: 'func', title: 'Tài trợ vốn', desc: 'Cấp tín dụng, bán chịu', r1Zone: 'zone-wholesaler', r2Zones: ['zone-nsx', 'zone-retailer']},
+      {id: 'fn_risk', type: 'func', title: 'Chia sẻ rủi ro', desc: 'Tồn kho, hàng cận date', r1Zone: 'zone-wholesaler', r2Zones: ['zone-nsx', 'zone-retailer']},
+      {id: 'fn_match', type: 'func', title: 'Hoàn thiện & Phân loại', desc: 'Chia nhỏ lô hàng lẻ', r1Zone: 'zone-retailer', r2Zones: ['zone-retailer', 'zone-nsx']},
+      {id: 'fn_contact', type: 'func', title: 'Tiếp xúc khách hàng', desc: 'Mạng lưới điểm bán', r1Zone: 'zone-retailer', r2Zones: ['zone-retailer', 'zone-nsx']},
+      {id: 'fn_nego', type: 'func', title: 'Thương lượng', desc: 'Giá & điều khoản mua', r1Zone: 'zone-retailer', r2Zones: ['zone-retailer', 'zone-nsx']},
+
+      // 8 Dòng chảy (Màu xanh)
+      {id: 'fl_phys', type: 'flow', title: 'Dòng sản phẩm vật chất', desc: 'Vận chuyển hàng hóa', r1Zone: 'zone-flow-forward', r2Zones: ['zone-flow-forward']},
+      {id: 'fl_title', type: 'flow', title: 'Dòng chuyển quyền sở hữu', desc: 'Pháp lý hàng hóa', r1Zone: 'zone-flow-forward', r2Zones: ['zone-flow-forward']},
+      {id: 'fl_promo', type: 'flow', title: 'Dòng xúc tiến', desc: 'POSM, khuyến mãi', r1Zone: 'zone-flow-forward', r2Zones: ['zone-flow-forward']},
+      {id: 'fl_pay', type: 'flow', title: 'Dòng thanh toán', desc: 'Tiền hàng về NSX', r1Zone: 'zone-flow-backward', r2Zones: ['zone-flow-backward']},
+      {id: 'fl_order', type: 'flow', title: 'Dòng đặt hàng', desc: 'Đơn đặt bổ sung', r1Zone: 'zone-flow-backward', r2Zones: ['zone-flow-backward']},
+      {id: 'fl_info', type: 'flow', title: 'Dòng thông tin', desc: 'Số liệu bán & tồn kho', r1Zone: 'zone-flow-two', r2Zones: ['zone-flow-two']},
+      {id: 'fl_fin', type: 'flow', title: 'Dòng tài chính / Tín dụng', desc: 'Công nợ & chiết khấu', r1Zone: 'zone-flow-two', r2Zones: ['zone-flow-two']},
+      {id: 'fl_risk', type: 'flow', title: 'Dòng chia sẻ rủi ro', desc: 'Đổi trả, hư hỏng', r1Zone: 'zone-flow-two', r2Zones: ['zone-flow-two']}
+    ];
+
+    // State
+    let currentRole = 'member';
+    let currentTeam = 'Đội 1';
+    let activeSessionTeam = null;
+    let playerName = '';
+    let currentRound = 1;
+    let selectedCardId = null;
+    let round2Unlocked = false;
+    let round1Locked = false;
+    let round1Submitted = false;
+    let round2Submitted = false;
+    let isViewingLockedR1 = false;
+    let isBtcAdmin = false;
+    let round1Snapshot = null;
+    let round2Draft = null;
+
+    // Timer State
+    let timeLeft = 9 * 60;
+    let timerInterval = null;
+    let isRunning = false;
+
+    // BTC Scores State (7 Đội thi: Đội 1, 2, 3, 5, 6, 7, 8 — Nhóm 04 là BTC)
+    const TEAM_LIST = ['Đội 1', 'Đội 2', 'Đội 3', 'Đội 5', 'Đội 6', 'Đội 7', 'Đội 8'];
+    let btcData = {};
+    TEAM_LIST.forEach(teamName => {
+      btcData[teamName] = {
+        v1_card: 0, v1_kpi: 0, v1_essay: 0, v1_pen: 0,
+        v2_card: 0, v2_kpi: 0, v2_pen: 0,
+        v1_detail: 'Chưa nộp', v2_detail: 'Chưa nộp'
+      };
+    });
+
+    // =========================================================================
+    // 3. KHỞI TẠO & CHỌN VAI TRÒ (TỰ ĐỘNG CHẠY ĐỒNG HỒ NGAY KHI VÀO PHÒNG)
+    // =========================================================================
+    function updateUserBadge() {
+      const teamSelect = document.getElementById('teamSelect');
+      const badgeEl = document.getElementById('userBadge');
+      if (!teamSelect.value) {
+        badgeEl.textContent = 'Chưa chọn đội';
+        return;
+      }
+      currentTeam = teamSelect.value;
+      const teamLabel = teamSelect.options[teamSelect.selectedIndex].text;
+      const roleLabel = currentRole === 'leader' ? '👑 Đội trưởng' : '👥 Thành viên';
+      badgeEl.textContent = `${teamLabel} · ${roleLabel}`;
+    }
+
+    function reopenTeamModal() {
+      document.getElementById('loginOverlay').style.display = 'flex';
+    }
+
+    function selectRole(role) {
+      currentRole = role;
+      document.getElementById('roleMember').classList.toggle('active', role === 'member');
+      document.getElementById('roleLeader').classList.toggle('active', role === 'leader');
+      if (role === 'member' && !isBtcAdmin) {
+        document.getElementById('receiptBox').classList.remove('visible');
+      }
+      updateUserBadge();
+      updateActionBarUI();
+    }
+
+    function resetAllToBeginning(shouldStartTimer = false) {
+      clearInterval(timerInterval);
+      isRunning = false;
+      timeLeft = 9 * 60;
+      renderTimer();
+
+      currentRound = 1;
+      selectedCardId = null;
+      round2Unlocked = false;
+      round1Locked = false;
+      round1Submitted = false;
+      round2Submitted = false;
+      isViewingLockedR1 = false;
+      isSubmittingNow = false;
+      round1Snapshot = null;
+      round2Draft = null;
+
+      ['r1_tx', 'r1_price', 'r1_note', 'r2_tx', 'r2_price_retail', 'r2_price_ecom', 'r2_cost_shift'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.value = '';
+      });
+
+      initCards();
+      setReadOnlyMode(false);
+
+      const tab1 = document.getElementById('tabR1');
+      if (tab1) {
+        tab1.className = 'round-tab active-r1';
+        tab1.textContent = 'VÒNG 1: Kênh 3 Cấp Truyền Thống (9 phút)';
+      }
+
+      const tab2 = document.getElementById('tabR2');
+      if (tab2) {
+        tab2.className = isBtcAdmin ? 'round-tab' : 'round-tab locked';
+        tab2.textContent = isBtcAdmin
+          ? 'VÒNG 2: Thẻ Cú Sốc - Bỏ NPP & Bán Buôn + Thêm E-Commerce (7 phút)'
+          : '🔒 VÒNG 2: Thẻ Cú Sốc - Bỏ NPP & Bán Buôn + Thêm E-Commerce (7 phút)';
+      }
+
+      document.getElementById('r1LockedBanner').classList.remove('visible');
+      document.getElementById('shockBanner').classList.remove('visible');
+      document.getElementById('ecomBox').classList.remove('visible');
+      document.getElementById('box-wholesaler').classList.remove('cut-off');
+
+      document.getElementById('kpiR1').style.display = 'grid';
+      document.getElementById('kpiR2').style.display = 'none';
+
+      document.getElementById('part1WeightLabel').textContent = 'Phần 1 + Phần 2 = 7,5 điểm (Cấu trúc: Kênh 3 cấp)';
+      document.getElementById('part2WeightLabel').textContent = 'Gộp chung 16 thẻ: tối đa 7,5 điểm (~0,47đ/thẻ)';
+      document.getElementById('part3Title').textContent = '🧮 PHẦN 3: TÍNH TOÁN KPI & LẬP LUẬN (2,5 điểm)';
+      document.getElementById('part3WeightLabel').textContent = '2 câu tính toán tự động (2,0đ) + 1 câu lập luận BTC chấm (0,5đ)';
+
+      document.getElementById('receiptBox').classList.remove('visible');
+      document.getElementById('nextRoundBtn').style.display = 'none';
+
+      updateUserBadge();
+      updateActionBarUI();
+
+      if (shouldStartTimer) {
+        startTimer();
+      }
+    }
+
+    function startGame() {
+      const teamSelect = document.getElementById('teamSelect');
+      if (!teamSelect.value) {
+        alert('Vui lòng chọn Đội của bạn trước khi vào phòng thi!');
+        teamSelect.focus();
+        return;
+      }
+      const nextTeam = teamSelect.value;
+      const isSwitchingTeam = Boolean(activeSessionTeam && activeSessionTeam !== nextTeam);
+      const isFreshStart = !activeSessionTeam || isSwitchingTeam;
+
+      currentTeam = nextTeam;
+      activeSessionTeam = nextTeam;
+      const teamLabel = teamSelect.options[teamSelect.selectedIndex].text;
+      playerName = document.getElementById('playerName').value.trim() || 'Thành viên ẩn danh';
+      document.getElementById('loginOverlay').style.display = 'none';
+
+      warmUpAppsScript(true);
+
+      if (isFreshStart) {
+        resetAllToBeginning(true);
+        if (isSwitchingTeam) {
+          showToast(`🔄 Đã chuyển sang ${teamLabel} và bắt đầu lại từ đầu Vòng 1 (09:00)!`);
+        } else {
+          showToast(`⏱️ Đã bắt đầu tính giờ Vòng 1 (09:00) cho ${teamLabel}!`);
+        }
+      } else {
+        updateUserBadge();
+        updateActionBarUI();
+        showToast(`✅ Đã cập nhật thông tin: ${teamLabel}`);
+      }
+    }
+
+    function updateActionBarUI() {
+      const teamSelect = document.getElementById('teamSelect');
+      const teamLabel = teamSelect && teamSelect.value
+        ? teamSelect.options[teamSelect.selectedIndex].text
+        : currentTeam;
+      const resetBtn = document.getElementById('resetBoardBtn');
+      const memberR2Btn = document.getElementById('memberNextRoundBtn');
+      const prevBtn = document.getElementById('previewReceiptBtn');
+      const subBtn = document.getElementById('officialSubmitBtn');
+      const hintEl = document.getElementById('submitHint');
+
+      // Chế độ chỉ xem Vòng 1 đã khóa -> Ẩn toàn bộ nút nộp lại / xếp lại
+      if (isViewingLockedR1) {
+        if (resetBtn) resetBtn.style.display = 'none';
+        if (memberR2Btn) memberR2Btn.style.display = 'none';
+        if (prevBtn) prevBtn.style.display = 'none';
+        if (subBtn) subBtn.style.display = 'none';
+        if (hintEl) {
+          hintEl.innerHTML = currentRole === 'leader'
+            ? `🔒 <strong>Vòng 1 đã nộp bài &amp; khóa chỉnh sửa.</strong> Bạn chỉ có thể xem lại đề và đáp án đã điền (không thể sửa hay nộp lại).`
+            : `🔒 <strong>Vòng 1 nháp đã khóa chỉnh sửa.</strong> Bấm "Quay lại làm tiếp Vòng 2" để tiếp tục thảo luận Vòng 2.`;
+        }
+        return;
+      }
+
+      if (resetBtn) resetBtn.style.display = 'inline-flex';
+
+      if (currentRole === 'leader') {
+        // Đội trưởng: Chỉ có 1 nút Nộp Bài Chính Thức (không có nút nộp lại sau khi đã nộp vòng đó)
+        if (memberR2Btn) memberR2Btn.style.display = 'none';
+        if (prevBtn) prevBtn.style.display = 'none';
+        if (currentRound === 2 && round2Submitted) {
+          if (subBtn) subBtn.style.display = 'none';
+          if (hintEl) {
+            hintEl.innerHTML = `✅ <strong>${teamLabel} đã nộp bài chính thức Vòng 2 về BTC!</strong> Hệ thống đã khóa nộp lại.`;
+          }
+        } else {
+          if (subBtn) {
+            subBtn.style.display = 'inline-flex';
+            subBtn.disabled = false;
+            subBtn.innerHTML = currentRound === 1
+              ? '🚀 Nộp Bài Vòng 1 &amp; Sang Vòng 2'
+              : '🚀 Nộp Bài Chính Thức Vòng 2 Về BTC';
+          }
+          if (hintEl) {
+            hintEl.innerHTML = currentRound === 1
+              ? `Bạn là <strong>Đội trưởng ${teamLabel}</strong>: Bấm <em>"Nộp Bài Vòng 1 &amp; Sang Vòng 2"</em> khi chốt xong (Vòng 1 sẽ khóa ngay sau khi nộp).`
+              : `Bạn là <strong>Đội trưởng ${teamLabel}</strong>: Bấm <em>"Nộp Bài Chính Thức Vòng 2 Về BTC"</em> để hoàn tất phần thi.`;
+          }
+        }
+      } else {
+        // Thành viên: Chỉ nháp & thảo luận cùng đội — KHÔNG được xem kết quả hay xuất biên nhận
+        if (subBtn) subBtn.style.display = 'none';
+        if (prevBtn) prevBtn.style.display = isBtcAdmin ? 'inline-flex' : 'none';
+        if (memberR2Btn) {
+          memberR2Btn.style.display = currentRound === 1 ? 'inline-flex' : 'none';
+        }
+        if (hintEl) {
+          hintEl.innerHTML = currentRound === 1
+            ? `Bạn đang ở chế độ <strong>Thành viên (${teamLabel})</strong>: Chỉ thao tác nháp &amp; thảo luận cùng đội (chỉ Đội trưởng mới được nộp bài &amp; xuất biên nhận).`
+            : `Bạn đang ở chế độ <strong>Thành viên (${teamLabel})</strong>: Đang thao tác nháp Vòng 2 để thảo luận cùng đội.`;
+        }
+      }
+    }
+
+    function initCards() {
+      const poolFunc = document.getElementById('pool-func');
+      const poolFlow = document.getElementById('pool-flow');
+      poolFunc.innerHTML = '';
+      poolFlow.innerHTML = '';
+
+      document.querySelectorAll('.dropzone').forEach(z => {
+        const hint = z.querySelector('.dropzone-hint');
+        z.innerHTML = '';
+        if (hint) z.appendChild(hint);
+      });
+
+      CARDS.forEach(card => {
+        const el = document.createElement('div');
+        el.className = `game-card ${card.type === 'func' ? 'card-func' : 'card-flow'}`;
+        el.id = card.id;
+        el.draggable = true;
+        el.innerHTML = `<span>${card.title}</span><span class="card-tag">${card.desc}</span>`;
+
+        el.addEventListener('dragstart', e => {
+          if (isViewingLockedR1) {
+            e.preventDefault();
+            return;
+          }
+          e.dataTransfer.setData('text/plain', card.id);
+          selectedCardId = card.id;
+        });
+
+        el.addEventListener('click', e => {
+          e.stopPropagation();
+          if (isViewingLockedR1) {
+            showToast('🔒 Vòng 1 đã khóa sửa, bạn chỉ có thể xem lại đáp án đã điền!');
+            return;
+          }
+          document.querySelectorAll('.game-card').forEach(c => c.classList.remove('selected-tap'));
+          if (selectedCardId === card.id) {
+            selectedCardId = null;
+          } else {
+            selectedCardId = card.id;
+            el.classList.add('selected-tap');
+          }
+        });
+
+        if (card.type === 'func') poolFunc.appendChild(el);
+        else poolFlow.appendChild(el);
+      });
+      updateRemainingCount();
+    }
+
+    function resetBoard() {
+      if (isViewingLockedR1) {
+        showToast('🔒 Vòng 1 đã khóa sửa, không thể xếp lại!');
+        return;
+      }
+      if (!confirm('Xếp lại toàn bộ 16 thẻ về kho ban đầu?')) return;
+      initCards();
+      document.getElementById('receiptBox').classList.remove('visible');
+      document.getElementById('nextRoundBtn').style.display = 'none';
+      if (currentRound === 1 && !isBtcAdmin) {
+        round2Unlocked = false;
+        const tab2 = document.getElementById('tabR2');
+        tab2.className = 'round-tab locked';
+        tab2.textContent = '🔒 VÒNG 2: Thẻ Cú Sốc - Bỏ NPP & Bán Buôn + Thêm E-Commerce (7 phút)';
+      }
+      if (round1Locked && currentRound === 2) {
+        round2Draft = captureRound2State();
+        saveTeamLockState(currentTeam);
+      }
+    }
+
+    // =========================================================================
+    // 4. KÉO THẢ & CHẠM CHỌN THẺ
+    // =========================================================================
+    function allowDrop(e) {
+      e.preventDefault();
+      if (e.currentTarget.classList.contains('dropzone')) {
+        e.currentTarget.classList.add('drag-over');
+      }
+    }
+
+    document.addEventListener('dragleave', e => {
+      if (e.target && e.target.classList && e.target.classList.contains('dropzone')) {
+        e.target.classList.remove('drag-over');
+      }
+    });
+
+    function dropToZone(e, zoneId) {
+      e.preventDefault();
+      const zone = document.getElementById(zoneId);
+      zone.classList.remove('drag-over');
+      const cardId = e.dataTransfer.getData('text/plain') || selectedCardId;
+      if (cardId) moveCardTo(cardId, zoneId);
+    }
+
+    function dropToPool(e) {
+      e.preventDefault();
+      const cardId = e.dataTransfer.getData('text/plain') || selectedCardId;
+      if (!cardId) return;
+      const cardObj = CARDS.find(c => c.id === cardId);
+      if (cardObj) {
+        moveCardTo(cardId, cardObj.type === 'func' ? 'pool-func' : 'pool-flow');
+      }
+    }
+
+    function clickZone(zoneId) {
+      if (!selectedCardId) return;
+      if (zoneId === 'pool-func' || zoneId === 'pool-flow') {
+        const cardObj = CARDS.find(c => c.id === selectedCardId);
+        moveCardTo(selectedCardId, cardObj.type === 'func' ? 'pool-func' : 'pool-flow');
+      } else {
+        moveCardTo(selectedCardId, zoneId);
+      }
+    }
+
+    function moveCardTo(cardId, targetId) {
+      if (isViewingLockedR1) {
+        showToast('🔒 Vòng 1 đã khóa sửa, không thể di chuyển thẻ!');
+        return;
+      }
+      const cardEl = document.getElementById(cardId);
+      const targetEl = document.getElementById(targetId);
+      if (!cardEl || !targetEl) return;
+
+      if (currentRound === 2 && targetId === 'zone-wholesaler') {
+        showToast('⚠️ Nhà bán buôn đã bị cắt bỏ ở Vòng 2! Hãy chuyển thẻ sang NSX hoặc Bán lẻ.');
+        return;
+      }
+
+      targetEl.appendChild(cardEl);
+      cardEl.classList.remove('selected-tap');
+      selectedCardId = null;
+      updateRemainingCount();
+
+      if (round1Locked && currentRound === 2) {
+        round2Draft = captureRound2State();
+        saveTeamLockState(currentTeam);
+      }
+    }
+
+    function updateRemainingCount() {
+      const inFunc = document.getElementById('pool-func').querySelectorAll('.game-card').length;
+      const inFlow = document.getElementById('pool-flow').querySelectorAll('.game-card').length;
+      document.getElementById('remainingCount').textContent = inFunc + inFlow;
+    }
+
+    // =========================================================================
+    // 5. CHUYỂN VÒNG THI & ĐỒNG HỒ ĐẾM NGƯỢC TỰ ĐỘNG
+    // =========================================================================
+    function getBoardCardMap() {
+      const map = {};
+      CARDS.forEach(card => {
+        const el = document.getElementById(card.id);
+        map[card.id] = el && el.parentElement ? el.parentElement.id : (card.type === 'func' ? 'pool-func' : 'pool-flow');
+      });
+      return map;
+    }
+
+    function applyBoardCards(cardMap) {
+      if (!cardMap) return;
+      CARDS.forEach(card => {
+        const el = document.getElementById(card.id);
+        const targetId = cardMap[card.id] || (card.type === 'func' ? 'pool-func' : 'pool-flow');
+        const targetEl = document.getElementById(targetId);
+        if (el && targetEl) targetEl.appendChild(el);
+      });
+      updateRemainingCount();
+    }
+
+    function captureRound1State() {
+      return {
+        cards: getBoardCardMap(),
+        r1_tx: document.getElementById('r1_tx').value,
+        r1_price: document.getElementById('r1_price').value,
+        r1_note: document.getElementById('r1_note').value,
+        receiptVisible: document.getElementById('receiptBox').classList.contains('visible'),
+        receiptTitle: document.getElementById('receiptTitle').textContent,
+        receiptSummary: document.getElementById('receiptSummary').textContent,
+        receiptCode: document.getElementById('receiptCode').value
+      };
+    }
+
+    function captureRound2State() {
+      return {
+        cards: getBoardCardMap(),
+        r2_tx: document.getElementById('r2_tx').value,
+        r2_price_retail: document.getElementById('r2_price_retail').value,
+        r2_price_ecom: document.getElementById('r2_price_ecom').value,
+        r2_cost_shift: document.getElementById('r2_cost_shift').value
+      };
+    }
+
+    function applyRound2Inputs(draft) {
+      if (!draft) return;
+      document.getElementById('r2_tx').value = draft.r2_tx || '';
+      document.getElementById('r2_price_retail').value = draft.r2_price_retail || '';
+      document.getElementById('r2_price_ecom').value = draft.r2_price_ecom || '';
+      document.getElementById('r2_cost_shift').value = draft.r2_cost_shift || '';
+    }
+
+    function setReadOnlyMode(readonly) {
+      isViewingLockedR1 = readonly;
+      document.querySelectorAll('.game-card').forEach(el => {
+        el.draggable = !readonly;
+        el.classList.toggle('card-readonly', readonly);
+        el.classList.remove('selected-tap');
+      });
+      selectedCardId = null;
+
+      ['r1_tx', 'r1_price', 'r1_note'].forEach(id => {
+        const inp = document.getElementById(id);
+        if (inp) {
+          inp.disabled = readonly;
+          inp.readOnly = readonly;
+        }
+      });
+
+      const resetBtn = document.getElementById('resetBoardBtn');
+      const prevBtn = document.getElementById('previewReceiptBtn');
+      const subBtn = document.getElementById('officialSubmitBtn');
+      if (resetBtn) resetBtn.disabled = readonly;
+      if (prevBtn) prevBtn.disabled = readonly;
+      if (subBtn) subBtn.disabled = readonly;
+      updateActionBarUI();
+    }
+
+    function saveTeamLockState(team) {
+      // Không lưu localStorage để đảm bảo F5 / reload luôn bắt đầu lại từ đầu
+    }
+
+    function loadTeamLockState(team) {
+      return null;
+    }
+
+    function clearLocalRoundLocks() {
+      TEAM_LIST.forEach(t => localStorage.removeItem(`uth_ws04_team_${t}`));
+      activeSessionTeam = null;
+      resetAllToBeginning(false);
+      showToast('🔓 Đã đặt lại toàn bộ bàn chơi về trạng thái ban đầu!');
+    }
+
+    function setRound(round, skipConfirm = false) {
+      if (round === 2 && !round2Unlocked && !isBtcAdmin) {
+        if (currentRole === 'leader') {
+          showToast('🔒 Vòng 2 đang khóa! Đội trưởng hãy hoàn thành Vòng 1 và bấm "Nộp Bài Vòng 1 & Sang Vòng 2".');
+          return;
+        }
+        // Thành viên chuyển sang nháp Vòng 2 (không chấm điểm, không xuất biên nhận)
+        if (!skipConfirm) {
+          if (!confirm('Chuyển sang màn hình nháp Vòng 2 (07:00) để thảo luận cùng đội?\nLưu ý: Vòng 1 nháp sẽ được khóa chỉ xem.')) {
+            return;
+          }
+        }
+        round2Unlocked = true;
+        skipConfirm = true;
+      }
+
+      // CASE A: Đã khóa Vòng 1 và người chơi bấm tab Vòng 1 (Rollback để xem lại) -> Chuyển sang CHẾ ĐỘ CHỈ XEM (Read-Only)
+      if (round === 1 && round1Locked && !isBtcAdmin) {
+        if (!isViewingLockedR1) {
+          round2Draft = captureRound2State();
+          saveTeamLockState(currentTeam);
+        }
+        currentRound = 1;
+        setReadOnlyMode(true);
+
+        const tab1 = document.getElementById('tabR1');
+        tab1.className = 'round-tab active-r1-readonly';
+        tab1.textContent = '🔒 VÒNG 1: Đang xem lại (Đã khóa sửa)';
+
+        const tab2 = document.getElementById('tabR2');
+        tab2.className = 'round-tab';
+        tab2.textContent = '▶️ Quay lại VÒNG 2 (Đang thi)';
+
+        document.getElementById('r1LockedBanner').classList.add('visible');
+        document.getElementById('shockBanner').classList.remove('visible');
+        document.getElementById('ecomBox').classList.remove('visible');
+        document.getElementById('box-wholesaler').classList.remove('cut-off');
+
+        document.getElementById('kpiR1').style.display = 'grid';
+        document.getElementById('kpiR2').style.display = 'none';
+
+        document.getElementById('part1WeightLabel').textContent = 'Phần 1 + Phần 2 = 7,5 điểm (Cấu trúc: Kênh 3 cấp)';
+        document.getElementById('part2WeightLabel').textContent = 'Gộp chung 16 thẻ: tối đa 7,5 điểm (~0,47đ/thẻ)';
+        document.getElementById('part3Title').textContent = '🧮 PHẦN 3: TÍNH TOÁN KPI & LẬP LUẬN (2,5 điểm)';
+        document.getElementById('part3WeightLabel').textContent = '2 câu tính toán tự động (2,0đ) + 1 câu lập luận BTC chấm (0,5đ)';
+
+        if (round1Snapshot) {
+          applyBoardCards(round1Snapshot.cards);
+          document.getElementById('r1_tx').value = round1Snapshot.r1_tx || '';
+          document.getElementById('r1_price').value = round1Snapshot.r1_price || '';
+          document.getElementById('r1_note').value = round1Snapshot.r1_note || '';
+          if (round1Snapshot.receiptCode && (currentRole === 'leader' || isBtcAdmin)) {
+            document.getElementById('receiptTitle').textContent = round1Snapshot.receiptTitle || '✅ Biên nhận Vòng 1 đã chốt';
+            document.getElementById('receiptSummary').textContent = round1Snapshot.receiptSummary || '';
+            document.getElementById('receiptCode').value = round1Snapshot.receiptCode;
+            document.getElementById('receiptBox').classList.add('visible');
+          } else {
+            document.getElementById('receiptBox').classList.remove('visible');
+          }
+        }
+        document.getElementById('nextRoundBtn').style.display = 'none';
+        showToast('👁️ Đang xem lại đề & đáp án Vòng 1 (Chế độ chỉ xem, không thể chỉnh sửa hay nộp lại).');
+        return;
+      }
+
+      // CASE B: Đang xem lại Vòng 1 (Read-Only) và bấm quay lại Vòng 2 -> Khôi phục bàn chơi Vòng 2 & giữ nguyên đồng hồ
+      if (round === 2 && round1Locked && isViewingLockedR1 && !isBtcAdmin) {
+        currentRound = 2;
+        setReadOnlyMode(false);
+
+        const tab1 = document.getElementById('tabR1');
+        tab1.className = 'round-tab readonly-tab';
+        tab1.textContent = round1Submitted ? '🔒 VÒNG 1: Đã nộp & khóa (Xem lại)' : '🔒 VÒNG 1: Đã khóa (Xem lại)';
+
+        const tab2 = document.getElementById('tabR2');
+        tab2.className = 'round-tab active-r2';
+        tab2.textContent = 'VÒNG 2: Thẻ Cú Sốc - Bỏ NPP & Bán Buôn + Thêm E-Commerce (7 phút)';
+
+        document.getElementById('r1LockedBanner').classList.remove('visible');
+        document.getElementById('shockBanner').classList.add('visible');
+        document.getElementById('ecomBox').classList.add('visible');
+        document.getElementById('box-wholesaler').classList.add('cut-off');
+
+        document.getElementById('kpiR1').style.display = 'none';
+        document.getElementById('kpiR2').style.display = 'grid';
+
+        document.getElementById('part1WeightLabel').textContent = 'Phần 1 + Phần 2 = 6,0 điểm (Bỏ NPP & Bán buôn + E-Commerce)';
+        document.getElementById('part2WeightLabel').textContent = 'Gộp chung 16 thẻ: tối đa 6,0 điểm (0,375đ/thẻ)';
+        document.getElementById('part3Title').textContent = '🧮 PHẦN 3: TÍNH TOÁN KPI NGHIỆP VỤ (4,0 điểm)';
+        document.getElementById('part3WeightLabel').textContent = '4 câu trắc nghiệm & tính toán · Chấm tự động 100% (1,0đ/câu)';
+
+        if (round2Draft) {
+          applyBoardCards(round2Draft.cards);
+          applyRound2Inputs(round2Draft);
+        }
+        document.getElementById('receiptBox').classList.remove('visible');
+        document.getElementById('nextRoundBtn').style.display = 'none';
+        showToast('▶️ Đã quay lại bàn thi Vòng 2!');
+        return;
+      }
+
+      // CASE C: Chuyển lần đầu từ Vòng 1 sang Vòng 2 -> Chụp snapshot & khóa vĩnh viễn Vòng 1
+      if (round === 2) warmUpAppsScript(true);
+      if (round === 2 && !round1Locked && !isBtcAdmin) {
+        if (!skipConfirm) {
+          if (!confirm('Xác nhận hoàn tất Vòng 1 và chuyển sang Vòng 2 (07:00)?\nLưu ý: Sau khi sang Vòng 2, Vòng 1 sẽ bị KHÓA SỬA hoàn toàn (bạn vẫn có thể bấm vào tab Vòng 1 để xem lại đề và đáp án đã điền, nhưng không thể sửa).')) {
+            return;
+          }
+        }
+        round1Snapshot = captureRound1State();
+        round2Draft = captureRound2State();
+        round1Locked = true;
+        saveTeamLockState(currentTeam);
+      }
+
+      currentRound = round;
+      setReadOnlyMode(false);
+      document.getElementById('r1LockedBanner').classList.remove('visible');
+
+      if (round === 2 && !isBtcAdmin) {
+        const tab1 = document.getElementById('tabR1');
+        tab1.className = 'round-tab readonly-tab';
+        tab1.textContent = round1Submitted ? '🔒 VÒNG 1: Đã nộp & khóa (Xem lại)' : '🔒 VÒNG 1: Đã khóa (Xem lại)';
+      } else {
+        document.getElementById('tabR1').className = round === 1 ? 'round-tab active-r1' : 'round-tab';
+      }
+
+      const tab2 = document.getElementById('tabR2');
+      if (round === 2) {
+        tab2.className = 'round-tab active-r2';
+        tab2.textContent = 'VÒNG 2: Thẻ Cú Sốc - Bỏ NPP & Bán Buôn + Thêm E-Commerce (7 phút)';
+      } else {
+        tab2.className = round2Unlocked || isBtcAdmin ? 'round-tab' : 'round-tab locked';
+      }
+
+      document.getElementById('shockBanner').classList.toggle('visible', round === 2);
+      document.getElementById('ecomBox').classList.toggle('visible', round === 2);
+      document.getElementById('box-wholesaler').classList.toggle('cut-off', round === 2);
+
+      document.getElementById('kpiR1').style.display = round === 1 ? 'grid' : 'none';
+      document.getElementById('kpiR2').style.display = round === 2 ? 'grid' : 'none';
+
+      if (round === 1) {
+        document.getElementById('part1WeightLabel').textContent = 'Phần 1 + Phần 2 = 7,5 điểm (Cấu trúc: Kênh 3 cấp)';
+        document.getElementById('part2WeightLabel').textContent = 'Gộp chung 16 thẻ: tối đa 7,5 điểm (~0,47đ/thẻ)';
+        document.getElementById('part3Title').textContent = '🧮 PHẦN 3: TÍNH TOÁN KPI & LẬP LUẬN (2,5 điểm)';
+        document.getElementById('part3WeightLabel').textContent = '2 câu tính toán tự động (2,0đ) + 1 câu lập luận BTC chấm (0,5đ)';
+      } else {
+        document.getElementById('part1WeightLabel').textContent = 'Phần 1 + Phần 2 = 6,0 điểm (Bỏ NPP & Bán buôn + E-Commerce)';
+        document.getElementById('part2WeightLabel').textContent = 'Gộp chung 16 thẻ: tối đa 6,0 điểm (0,375đ/thẻ)';
+        document.getElementById('part3Title').textContent = '🧮 PHẦN 3: TÍNH TOÁN KPI NGHIỆP VỤ (4,0 điểm)';
+        document.getElementById('part3WeightLabel').textContent = '4 câu trắc nghiệm & tính toán · Chấm tự động 100% (1,0đ/câu)';
+      }
+
+      document.getElementById('receiptBox').classList.remove('visible');
+      document.getElementById('nextRoundBtn').style.display = 'none';
+
+      clearInterval(timerInterval);
+      isRunning = false;
+      timeLeft = round === 1 ? 9 * 60 : 7 * 60;
+      renderTimer();
+      startTimer();
+      if (!skipConfirm) {
+        showToast(`⏱️ Đã chuyển sang Vòng ${round} và tự động tính giờ!`);
+      }
+    }
+
+    function startTimer() {
+      if (isRunning) return;
+      isRunning = true;
+      document.getElementById('timerBtn').textContent = 'Tạm dừng';
+      timerInterval = setInterval(() => {
+        if (timeLeft > 0) {
+          timeLeft--;
+          renderTimer();
+        } else {
+          clearInterval(timerInterval);
+          isRunning = false;
+          document.getElementById('timerBtn').textContent = 'Hết giờ';
+          showToast('⏰ Hết giờ làm bài! Các Đội trưởng hãy bấm Nộp bài ngay.');
+        }
+      }, 1000);
+    }
+
+    function toggleTimer() {
+      if (isRunning) {
+        clearInterval(timerInterval);
+        isRunning = false;
+        document.getElementById('timerBtn').textContent = 'Tiếp tục';
+      } else if (timeLeft > 0) {
+        startTimer();
+      }
+    }
+
+    function renderTimer() {
+      const m = String(Math.floor(timeLeft / 60)).padStart(2, '0');
+      const s = String(timeLeft % 60).padStart(2, '0');
+      const display = document.getElementById('timerDisplay');
+      document.getElementById('clockText').textContent = `${m}:${s}`;
+      display.classList.remove('warning', 'danger');
+      if (timeLeft <= 60) display.classList.add('danger');
+      else if (timeLeft <= 120) display.classList.add('warning');
+    }
+
+    // =========================================================================
+    // 6. CHẤM ĐIỂM TỰ ĐỘNG THEO DỮ LIỆU TP. THỦ ĐỨC – CASE VINAMILK:
+    //    - M = 5, k = 3 NPP khu vực, C = 1.000 tiệm tạp hóa, P = 280.000 VNĐ
+    //    - Margin: NPP 8%, Bán buôn 5%, Tạp hóa 15% (Kênh 0 cấp Giấc Mơ Sữa Việt / App: 15%)
+    //    - Vòng 1:
+    //        + N = k(M + C) = 3 * (5 + 1000) = 3015 giao dịch
+    //        + Giá NTD: 280.000 * 1.08 * 1.05 * 1.15 = 365.148đ (hoặc 2 cấp 280.000 * 1.08 * 1.15 = 347.760đ)
+    //    - Vòng 2:
+    //        + N = M * C = 5 * 1000 = 5000 giao dịch
+    //        + Giá bán lẻ mới khi bỏ Bán buôn: 280.000 * 1.08 * 1.15 = 347.760đ (hoặc bỏ NPP+BB: 280.000 * 1.15 = 322.000đ)
+    //        + Giá kênh E-Commerce 0 cấp (Margin 15%): 280.000 * 1.15 = 322.000đ
+    // =========================================================================
+    function evaluateAndGenerateReceipt(isOfficialSubmit) {
+      if (currentRole !== 'leader' && !isBtcAdmin) {
+        showToast('👥 Chế độ Thành viên chỉ dùng để nháp & thảo luận cùng đội. Chỉ Đội trưởng mới được nộp bài và xuất biên nhận!');
+        return;
+      }
+      if (isViewingLockedR1) {
+        showToast('🔒 Vòng 1 đã nộp và khóa sửa! Hãy quay lại Vòng 2 để tiếp tục.');
+        return;
+      }
+      if (isOfficialSubmit && currentRound === 1 && round1Submitted && !isBtcAdmin) {
+        showToast('🔒 Vòng 1 đã được nộp trước đó, không thể nộp lại!');
+        return;
+      }
+      if (isOfficialSubmit && currentRound === 2 && round2Submitted && !isBtcAdmin) {
+        showToast('🔒 Vòng 2 đã được nộp trước đó, không thể nộp lại!');
+        return;
+      }
+
+      if (currentRound === 1) {
+        const placedCount = 16 - (
+          document.getElementById('pool-func').querySelectorAll('.game-card').length +
+          document.getElementById('pool-flow').querySelectorAll('.game-card').length
+        );
+        const txVal = document.getElementById('r1_tx').value.trim();
+        const priceVal = document.getElementById('r1_price').value.trim();
+
+        if (placedCount === 0 && !txVal && !priceVal) {
+          showToast('⚠️ Bạn chưa làm bài Vòng 1! Hãy xếp thẻ và nhập KPI trước khi nộp.');
+          return;
+        }
+        if (isOfficialSubmit && !isBtcAdmin) {
+          const warnPrefix = placedCount < 16
+            ? `Kho thẻ vẫn còn ${16 - placedCount} thẻ chưa xếp.\n`
+            : '';
+          if (!confirm(`${warnPrefix}Xác nhận NỘP BÀI CHÍNH THỨC Vòng 1 và chuyển thẳng sang Vòng 2 (07:00)?\nLưu ý: Sau khi bấm OK, Vòng 1 sẽ bị KHÓA VĨNH VIỄN (không thể nộp lại hay chỉnh sửa, chỉ có thể bấm tab Vòng 1 để xem lại).`)) {
+            return;
+          }
+        } else if (!isOfficialSubmit && placedCount < 16) {
+          if (!confirm(`Kho thẻ vẫn còn ${16 - placedCount} thẻ chưa xếp. Bạn vẫn muốn xem kết quả nháp Vòng 1 chứ?`)) {
+            return;
+          }
+        }
+      } else if (currentRound === 2 && isOfficialSubmit && !isBtcAdmin) {
+        if (!confirm('Xác nhận NỘP BÀI CHÍNH THỨC Vòng 2 về BTC?\nLưu ý: Sau khi nộp sẽ không thể nộp lại Vòng 2.')) {
+          return;
+        }
+      }
+
+      let correctCards = 0;
+
+      CARDS.forEach(card => {
+        const el = document.getElementById(card.id);
+        const parentId = el && el.parentElement ? el.parentElement.id : '';
+        if (currentRound === 1) {
+          if (parentId === card.r1Zone) correctCards++;
+        } else {
+          if (card.r2Zones.includes(parentId)) correctCards++;
+        }
+      });
+
+      const maxCardScore = currentRound === 1 ? 7.5 : 6.0;
+      const cardScore = Number(((correctCards / 16) * maxCardScore).toFixed(2));
+      let kpiScore = 0;
+      let kpiSummary = '';
+
+      if (currentRound === 1) {
+        const tx = Number(document.getElementById('r1_tx').value);
+        const price = Number(document.getElementById('r1_price').value);
+        const note = document.getElementById('r1_note').value.trim();
+
+        // N = k * (M + C) = 3 * (5 + 1000) = 3015
+        const txOk = (tx === 1015);
+        // Giá NTD: 280.000 * 1.08 * 1.05 * 1.15 = 365148 (3 cấp trung gian) hoặc 280.000 * 1.08 * 1.15 = 347760 (2 cấp trung gian)
+        const priceOk = [365148, 347760, 376901, 358056].includes(price);
+
+        // Vòng 1: 2 câu tính toán, mỗi câu 1,0 điểm (tối đa 2,0đ tự động)
+        if (txOk) kpiScore += 1.0;
+        if (priceOk) kpiScore += 1.0;
+        kpiSummary = `GD=${tx || 0} (${txOk ? 'Đúng' : 'Sai'}), Giá=${price || 0}đ (${priceOk ? 'Đúng' : 'Sai'}) | Lập luận (0,5đ BTC chấm): ${note || '(Trống)'}`;
+      } else {
+        const tx = Number(document.getElementById('r2_tx').value);
+        const pRetail = Number(document.getElementById('r2_price_retail').value);
+        const pEcom = Number(document.getElementById('r2_price_ecom').value);
+        const shift = document.getElementById('r2_cost_shift').value;
+
+        // N = M * C = 5 * 1000 = 5000
+        const txOk = (tx === 5000);
+        // Giá bán lẻ mới khi bỏ cả NPP (8%) & Bán buôn (5%), chỉ còn Tạp hóa (15%): 280.000 * 1.15 = 322000
+        const retailOk = [322000, 329412].includes(pRetail);
+        // Giá E-Commerce 0 cấp (Margin 15%): 280.000 * 1.15 = 322000
+        const ecomOk = [322000, 329412].includes(pEcom);
+        const shiftOk = (shift === 'shift_to_nsx');
+
+        // Vòng 2: 4 câu tự động, mỗi câu 1,0 điểm (tối đa 4,0đ tự động)
+        if (txOk) kpiScore += 1.0;
+        if (retailOk) kpiScore += 1.0;
+        if (ecomOk) kpiScore += 1.0;
+        if (shiftOk) kpiScore += 1.0;
+        kpiSummary = `GD=${tx || 0} (${txOk ? 'Đúng' : 'Sai'}), GiáBL=${pRetail || 0}đ (${retailOk ? 'Đúng' : 'Sai'}), GiáEcom=${pEcom || 0}đ (${ecomOk ? 'Đúng' : 'Sai'}), ChiPhí=${shift === 'shift_to_nsx' ? 'Dịch chuyển về NSX (Đúng)' : 'Chưa chuẩn'}`;
+      }
+
+      kpiScore = Number(kpiScore.toFixed(2));
+      const totalAutoScore = Number((cardScore + kpiScore).toFixed(2));
+      const maxAutoScore = currentRound === 1 ? '9.5' : '10.0';
+
+      const payload = {
+        team: currentTeam,
+        round: currentRound,
+        leader: playerName,
+        correctCards: `${correctCards}/16`,
+        cardScore: cardScore,
+        kpiScore: kpiScore,
+        autoScore: totalAutoScore,
+        kpiSummary: kpiSummary,
+        timestamp: new Date().toLocaleTimeString('vi-VN')
+      };
+
+      if (currentRound === 1) {
+        btcData[currentTeam].v1_card = cardScore;
+        btcData[currentTeam].v1_kpi = kpiScore;
+        btcData[currentTeam].v1_detail = `${correctCards}/16 thẻ · ${kpiSummary}`;
+      } else {
+        btcData[currentTeam].v2_card = cardScore;
+        btcData[currentTeam].v2_kpi = kpiScore;
+        btcData[currentTeam].v2_detail = `${correctCards}/16 thẻ · ${kpiSummary}`;
+      }
+
+      const receiptText = `[UTH-WS04|${currentTeam}|V${currentRound}|TựĐộng:${totalAutoScore}/${maxAutoScore}|Thẻ:${cardScore}/${maxCardScore}(${correctCards}/16)|KPI:${kpiScore}/${currentRound === 1 ? '2' : '4'}|${kpiSummary}]`;
+
+      const summaryStr = currentRound === 1
+        ? `${currentTeam} (Vòng 1): Thẻ ${correctCards}/16 (${cardScore}/7,5đ) + KPI tự động (${kpiScore}/2đ) = ${totalAutoScore}/9,5đ (còn 0,5đ câu lập luận do BTC chấm trực tiếp).`
+        : `${currentTeam} (Vòng 2): Thẻ ${correctCards}/16 (${cardScore}/6đ) + KPI tự động (${kpiScore}/4đ) = ${totalAutoScore}/10,0 điểm.`;
+
+      document.getElementById('receiptSummary').textContent = summaryStr;
+      document.getElementById('receiptCode').value = receiptText;
+
+      // TRƯỜNG HỢP 1: Đội trưởng bấm NỘP BÀI VÒNG 1 -> Gửi ngầm, KHÓA VÒNG 1 & BẮT BUỘC CHUYỂN THẲNG SANG VÒNG 2
+      if (isOfficialSubmit && currentRound === 1) {
+        if (isSubmittingNow) {
+          showToast('⚡ Bài đang được đồng bộ lên Google Sheet, vui lòng chờ giây lát...');
+          return;
+        }
+        isSubmittingNow = true;
+        round1Submitted = true;
+        round2Unlocked = true;
+
+        const initStatusTitle = `⚡ Đã nộp bài ${currentTeam} (Vòng 1: ${totalAutoScore}/9,5đ tự động) lúc ${payload.timestamp} — Đang đồng bộ lên Google Sheet BTC...`;
+        document.getElementById('receiptTitle').textContent = initStatusTitle;
+
+        // Chụp snapshot Vòng 1 (bao gồm biên nhận) & khóa cứng Vòng 1 trước khi chuyển sang Vòng 2
+        round1Snapshot = {
+          cards: getBoardCardMap(),
+          r1_tx: document.getElementById('r1_tx').value,
+          r1_price: document.getElementById('r1_price').value,
+          r1_note: document.getElementById('r1_note').value,
+          receiptVisible: true,
+          receiptTitle: initStatusTitle,
+          receiptSummary: summaryStr,
+          receiptCode: receiptText
+        };
+        round2Draft = captureRound2State();
+        round1Locked = true;
+        saveTeamLockState(currentTeam);
+
+        // Chuyển thẳng bắt buộc sang Vòng 2 (07:00)
+        setRound(2, true);
+        showToast(`✅ Đã nộp Vòng 1 (${totalAutoScore}/9,5đ) & chuyển sang Vòng 2 (07:00)! Vòng 1 đã khóa sửa.`);
+
+        sendWithRetry(payload, 1, performance.now(), (finalStatusText) => {
+          isSubmittingNow = false;
+          if (finalStatusText && round1Snapshot) {
+            round1Snapshot.receiptTitle = finalStatusText;
+            saveTeamLockState(currentTeam);
+            if (isViewingLockedR1 && currentRound === 1) {
+              document.getElementById('receiptTitle').textContent = finalStatusText;
+            }
+          }
+        });
+        return;
+      }
+
+      // TRƯỜNG HỢP 2: Đội trưởng bấm NỘP BÀI VÒNG 2 -> Gửi & khóa nút nộp lại Vòng 2
+      if (isOfficialSubmit && currentRound === 2) {
+        if (isSubmittingNow) {
+          showToast('⚡ Bài đang được đồng bộ lên Google Sheet, vui lòng chờ giây lát...');
+          return;
+        }
+        isSubmittingNow = true;
+        round2Submitted = true;
+        saveTeamLockState(currentTeam);
+        updateActionBarUI();
+
+        document.getElementById('receiptBox').classList.add('visible');
+        document.getElementById('nextRoundBtn').style.display = 'none';
+        document.getElementById('receiptTitle').textContent =
+          `⚡ Đã chốt bài ${currentTeam} (Vòng 2) — Đang đồng bộ tức thì lên Google Sheet BTC...`;
+
+        sendWithRetry(payload, 1, performance.now(), (finalStatusText) => {
+          isSubmittingNow = false;
+          if (finalStatusText) {
+            document.getElementById('receiptTitle').textContent = finalStatusText;
+          }
+        });
+        return;
+      }
+
+      // TRƯỜNG HỢP 3: Thành viên kiểm tra nháp (isOfficialSubmit === false)
+      document.getElementById('receiptBox').classList.add('visible');
+      document.getElementById('receiptTitle').textContent = `📋 Biên nhận nháp (${currentTeam} - Vòng ${currentRound})`;
+      if (currentRound === 1) {
+        round2Unlocked = true;
+        const tab2 = document.getElementById('tabR2');
+        tab2.classList.remove('locked');
+        tab2.textContent = '🔓 VÒNG 2: Thẻ Cú Sốc - Bỏ NPP & Bán Buôn + Thêm E-Commerce (7 phút)';
+        document.getElementById('nextRoundBtn').style.display = 'inline-flex';
+      } else {
+        document.getElementById('nextRoundBtn').style.display = 'none';
+      }
+    }
+
+    function sendWithRetry(payload, attempt, startTimeMs, onDone) {
+      if (!GAS_WEB_APP_URL) {
+        const msg = `✅ Đã chốt kết quả trên máy! (Chưa gắn link Google Sheet -> Hãy bấm Copy Biên Nhận dán vào khung chat Meet/Zalo cho Trọng tài)`;
+        if (onDone) onDone(msg);
+        return;
+      }
+
+      const bodyStr = JSON.stringify(payload);
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 4500);
+
+      fetch(GAS_WEB_APP_URL, {
+        method: 'POST',
+        mode: 'no-cors',
+        cache: 'no-store',
+        keepalive: true,
+        signal: controller.signal,
+        headers: {'Content-Type': 'text/plain;charset=utf-8'},
+        body: bodyStr
+      })
+        .then(() => {
+          clearTimeout(timeoutId);
+          const elapsedSec = ((performance.now() - startTimeMs) / 1000).toFixed(2);
+          const msg = `✅ Đã nộp thành công bài ${payload.team} (Vòng ${payload.round}: ${payload.autoScore}đ tự động) lên Google Sheet BTC lúc ${payload.timestamp} (${elapsedSec}s)!`;
+          showToast(`🎉 Nộp bài Vòng ${payload.round} thành công (${elapsedSec}s)!`);
+          if (onDone) onDone(msg);
+        })
+        .catch(() => {
+          clearTimeout(timeoutId);
+          if (attempt < 4) {
+            const delay = attempt * 350;
+            setTimeout(() => sendWithRetry(payload, attempt + 1, startTimeMs, onDone), delay);
+          } else {
+            let beaconSent = false;
+            try {
+              if (navigator.sendBeacon) {
+                beaconSent = navigator.sendBeacon(GAS_WEB_APP_URL, new Blob([bodyStr], {type: 'text/plain;charset=utf-8'}));
+              }
+            } catch (e) { }
+
+            const msg = beaconSent
+              ? `✅ Đã gửi gói tin nền cho ${payload.team} (Vòng ${payload.round})! Bạn vẫn có thể Copy Biên Nhận dự phòng bên dưới.`
+              : `⚠️ Mạng yếu chưa đồng bộ được Google Sheet. Hãy bấm nút "Copy Biên Nhận" bên cạnh và dán vào khung chat lớp!`;
+            if (onDone) onDone(msg);
+          }
+        });
+    }
+
+    function copyReceipt() {
+      const box = document.getElementById('receiptCode');
+      box.select();
+      document.execCommand('copy');
+      showToast('📋 Đã copy biên nhận! Hãy dán (Ctrl+V) vào khung chat Google Meet / Zalo.');
+    }
+
+    // =========================================================================
+    // 7. BẢNG TỔNG HỢP DÀNH CHO BTC / TRỌNG TÀI ĐẶNG NGUYÊN MẠNH
+    // =========================================================================
+    function openBtcLogin() {
+      const pass = prompt('Nhập mật khẩu BTC Nhóm 04:');
+      if (pass && pass.trim().toUpperCase() === 'NHOM04') {
+        isBtcAdmin = true;
+        setReadOnlyMode(false);
+        document.getElementById('r1LockedBanner').classList.remove('visible');
+        document.getElementById('tabR2').classList.remove('locked');
+        document.getElementById('loginOverlay').style.display = 'none';
+        switchView('btc');
+      } else if (pass !== null) {
+        alert('Sai mật khẩu BTC!');
+      }
+    }
+
+    function switchView(view) {
+      document.getElementById('gameView').style.display = view === 'game' ? 'block' : 'none';
+      document.getElementById('btcView').style.display = view === 'btc' ? 'block' : 'none';
+      if (view === 'btc') {
+        document.getElementById('gasUrlInput').value = GAS_WEB_APP_URL;
+        renderBtcTable();
+      }
+    }
+
+    function saveGasUrl() {
+      GAS_WEB_APP_URL = document.getElementById('gasUrlInput').value.trim();
+      localStorage.setItem('uth_ws_gas_url', GAS_WEB_APP_URL);
+      showToast('✅ Đã lưu URL Google Apps Script!');
+    }
+
+    function syncFromGoogleSheet() {
+      if (!GAS_WEB_APP_URL) {
+        showToast('⚠️ Bạn chưa dán URL Google Apps Script ở ô bên dưới.');
+        return;
+      }
+      showToast('🔄 Đang đồng bộ dữ liệu từ Google Sheet...');
+      fetch(GAS_WEB_APP_URL)
+        .then(res => res.json())
+        .then(rows => {
+          rows.forEach(r => {
+            if (btcData[r.team]) {
+              if (Number(r.round) === 1) {
+                btcData[r.team].v1_card = Number(r.cardScore) || 0;
+                btcData[r.team].v1_kpi = Number(r.kpiScore) || 0;
+                btcData[r.team].v1_detail = `${r.correctCards} · ${r.kpiSummary}`;
+              } else if (Number(r.round) === 2) {
+                btcData[r.team].v2_card = Number(r.cardScore) || 0;
+                btcData[r.team].v2_kpi = Number(r.kpiScore) || 0;
+                btcData[r.team].v2_detail = `${r.correctCards} · ${r.kpiSummary}`;
+              }
+            }
+          });
+          renderBtcTable();
+          showToast('✅ Đã cập nhật điểm mới nhất từ Google Sheet!');
+        })
+        .catch(() => showToast('❌ Lỗi đọc dữ liệu. Hãy kiểm tra lại quyền truy cập Web App (Anyone).'));
+    }
+
+    function promptImportReceipt() {
+      const raw = prompt('Dán đoạn mã Biên Nhận từ khung chat Meet/Zalo vào đây:');
+      if (!raw) return;
+      try {
+        let decoded = null;
+        if (raw.includes('#TOKEN:')) {
+          const tokenPart = raw.split('#TOKEN:')[1].trim();
+          decoded = JSON.parse(decodeURIComponent(escape(atob(tokenPart))));
+        } else {
+          const match = raw.match(/\[UTH-WS04\|([^\]]+)\]/);
+          if (!match) throw new Error('Invalid format');
+          const parts = match[1].split('|');
+          if (parts.length < 6) throw new Error('Incomplete fields');
+          const team = parts[0].trim();
+          const round = Number(parts[1].replace(/\D/g, ''));
+          const autoScore = Number(parts[2].split(':')[1].split('/')[0]) || 0;
+          const cardPart = parts[3].split(':')[1];
+          const cardScore = Number(cardPart.split('/')[0]) || 0;
+          const cardsMatch = cardPart.match(/\(([^)]+)\)/);
+          const correctCards = cardsMatch ? cardsMatch[1] : '0/16';
+          const kpiScore = Number(parts[4].split(':')[1].split('/')[0]) || 0;
+          const kpiSummary = parts.slice(5).join('|').trim();
+          decoded = {
+            team,
+            round,
+            leader: 'Nhập từ biên nhận',
+            correctCards,
+            cardScore,
+            kpiScore,
+            autoScore,
+            kpiSummary,
+            timestamp: new Date().toLocaleTimeString('vi-VN')
+          };
+        }
+
+        if (decoded && btcData[decoded.team]) {
+          if (decoded.round === 1) {
+            btcData[decoded.team].v1_card = decoded.cardScore || 0;
+            btcData[decoded.team].v1_kpi = decoded.kpiScore || 0;
+            btcData[decoded.team].v1_detail = `${decoded.correctCards} · ${decoded.kpiSummary}`;
+          } else {
+            btcData[decoded.team].v2_card = decoded.cardScore || 0;
+            btcData[decoded.team].v2_kpi = decoded.kpiScore || 0;
+            btcData[decoded.team].v2_detail = `${decoded.correctCards} · ${decoded.kpiSummary}`;
+          }
+          renderBtcTable();
+
+          if (GAS_WEB_APP_URL) {
+            fetch(GAS_WEB_APP_URL, {
+              method: 'POST',
+              mode: 'no-cors',
+              headers: {'Content-Type': 'text/plain;charset=utf-8'},
+              body: JSON.stringify(decoded)
+            })
+              .then(() => {
+                showToast(`✅ Đã nhập điểm ${decoded.team} (Vòng ${decoded.round}) và đồng bộ thẳng lên Google Sheet!`);
+              })
+              .catch(() => {
+                showToast(`⚠️ Đã nhập lên web nhưng chưa đẩy được lên Google Sheet.`);
+              });
+          } else {
+            showToast(`✅ Đã nhập điểm ${decoded.team} (Vòng ${decoded.round}) thành công!`);
+          }
+        } else {
+          alert('Không tìm thấy tên đội hợp lệ trong biên nhận!');
+        }
+      } catch (e) {
+        alert('Mã biên nhận không hợp lệ. Vui lòng copy đầy đủ đoạn [UTH-WS04|...]');
+      }
+    }
+
+    function updateScore(team, field, val) {
+      btcData[team][field] = Number(val) || 0;
+      renderBtcTable();
+    }
+
+    function renderBtcTable() {
+      const teams = Object.keys(btcData).map(team => {
+        const d = btcData[team];
+        const tot1 = Math.max(0, Number((d.v1_card + d.v1_kpi + d.v1_essay - d.v1_pen).toFixed(2)));
+        const tot2 = Math.max(0, Number((d.v2_card + d.v2_kpi - d.v2_pen).toFixed(2)));
+        const grand = Number((tot1 + tot2).toFixed(2));
+        return {team, ...d, tot1, tot2, grand};
+      });
+
+      teams.sort((a, b) => b.grand - a.grand);
+
+      const tbody = document.getElementById('btcTableBody');
+      tbody.innerHTML = '';
+
+      teams.forEach((t, idx) => {
+        const rank = idx + 1;
+        let rankClass = '';
+        let bonus = '0đ';
+        if (t.grand > 0) {
+          if (rank === 1) {rankClass = 'rank-1'; bonus = '+5đ / SV';}
+          else if (rank === 2) {rankClass = 'rank-2'; bonus = '+4đ / SV';}
+          else if (rank === 3) {rankClass = 'rank-3'; bonus = '+2đ / SV';}
+        }
+
+        const tr = document.createElement('tr');
+        tr.className = rankClass;
+        tr.innerHTML = `
+        <td>#${rank}</td>
+        <td><strong>${t.team}</strong></td>
+        <td title="${t.v1_detail}"><strong>${t.v1_card}</strong></td>
+        <td title="${t.v1_detail}"><strong>${t.v1_kpi}</strong></td>
+        <td title="${t.v1_detail}"><input class="score-input" type="number" step="0.1" min="0" max="0.5" value="${t.v1_essay}" onchange="updateScore('${t.team}','v1_essay',this.value)"></td>
+        <td><input class="score-input" type="number" step="0.5" min="0" max="10" value="${t.v1_pen}" onchange="updateScore('${t.team}','v1_pen',this.value)"></td>
+        <td><strong>${t.tot1}</strong></td>
+        <td title="${t.v2_detail}"><strong>${t.v2_card}</strong></td>
+        <td title="${t.v2_detail}"><strong>${t.v2_kpi}</strong></td>
+        <td><input class="score-input" type="number" step="0.5" min="0" max="10" value="${t.v2_pen}" onchange="updateScore('${t.team}','v2_pen',this.value)"></td>
+        <td><strong>${t.tot2}</strong></td>
+        <td style="font-size:1rem; color:var(--uth-dark);"><strong>${t.grand} / 20</strong></td>
+        <td><strong>${bonus}</strong></td>
+      `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function exportCsv() {
+      let csv = "\uFEFFHang,Doi,V1_The_7.5d,V1_KPI_2d,V1_LapLuan_0.5d,V1_TruLoi,Tong_V1_10d,V2_The_6d,V2_KPI_4d,V2_TruLoi,Tong_V2_10d,Tong_Chung_Cuoc_20d\n";
+      const rows = document.querySelectorAll('#btcTableBody tr');
+      rows.forEach(tr => {
+        const cells = tr.querySelectorAll('td');
+        const vals = [];
+        for (let i = 0; i < 12; i++) {
+          const inp = cells[i].querySelector('input');
+          vals.push(inp ? inp.value : cells[i].innerText.replace(' / 20', '').trim());
+        }
+        csv += vals.join(',') + "\n";
+      });
+      const blob = new Blob([csv], {type: 'text/csv;charset=utf-8;'});
+      const link = document.createElement('a');
+      link.href = URL.createObjectURL(blob);
+      link.download = 'KetQua_Workshop_Nhom04_Vinamilk.csv';
+      link.click();
+    }
+
+    function showToast(msg) {
+      const t = document.getElementById('toast');
+      t.textContent = msg;
+      t.style.display = 'block';
+      setTimeout(() => {t.style.display = 'none';}, 3500);
+    }
+  </script>
+</body>
+
+</html>
